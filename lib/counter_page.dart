@@ -98,9 +98,9 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
   }
 
   Color get _countColor {
-    if (_count > 0) return const Color(0xFF4ECCA3);
-    if (_count < 0) return const Color(0xFFFF6B6B);
-    return const Color(0xFFECECEC);
+    if (_count > 0) return Colors.tealAccent;
+    if (_count < 0) return Colors.redAccent;
+    return Colors.white;
   }
 
   @override
@@ -121,18 +121,18 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
                       Text(
                         'RUST COUNTER',
                         style: TextStyle(
-                          color: Color(0xFF4ECCA3),
-                          fontSize: 14,
+                          fontSize: 15,
                           letterSpacing: 3,
+                          color: Colors.tealAccent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Powered by: \nffi + flutter_rust_bridge',
+                        'Powered by: \n' 'ffi + flutter_rust_bridge',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 13,
+                          fontSize: 14,
                         ),
                       ),
                     ],
@@ -143,7 +143,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
             ),
             const Spacer(),
             _loading
-                ? const CircularProgressIndicator(color: Color(0xFF4ECCA3))
+                ? const CircularProgressIndicator(color: Colors.tealAccent)
                 : ScaleTransition(
                     scale: _scaleAnim,
                     child: Column(
@@ -182,7 +182,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
                 children: [
                   CounterButton(
                     label: '−',
-                    color: const Color(0xFFFF6B6B),
+                    color: Colors.redAccent,
                     onTap: _decrement,
                     onLongPressStart: () => _startLongPress(_decrement),
                     onLongPressEnd: _cancelLongPress,
@@ -190,7 +190,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
                   const SizedBox(width: 16),
                   CounterButton(
                     label: '+',
-                    color: const Color(0xFF4ECCA3),
+                    color: Colors.tealAccent,
                     onTap: _increment,
                     onLongPressStart: () => _startLongPress(_increment),
                     onLongPressEnd: _cancelLongPress,

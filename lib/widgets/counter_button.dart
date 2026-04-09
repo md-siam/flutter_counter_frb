@@ -36,10 +36,10 @@ class CounterButton extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                color: color,
-                fontSize: 36,
-                fontWeight: FontWeight.w300,
                 height: 1,
+                fontSize: 36,
+                color: color,
+                fontWeight: FontWeight.w300,
               ),
             ),
           ),

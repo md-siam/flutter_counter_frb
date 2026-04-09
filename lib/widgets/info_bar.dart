@@ -48,17 +48,18 @@ class _InfoCell extends StatelessWidget {
           Text(
             label,
             style: const TextStyle(
-              color: Colors.white,
               fontSize: 13,
               letterSpacing: 1,
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 3),
           Text(
             value,
             style: const TextStyle(
-              color: Color(0xFF4ECCA3),
               fontSize: 14,
+              color: Colors.tealAccent,
               fontWeight: FontWeight.w600,
             ),
           ),

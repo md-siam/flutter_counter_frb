@@ -8,11 +8,9 @@ class RustBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFFCE412B).withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(
-          color: const Color(0xFFCE412B).withValues(alpha: 0.4),
-        ),
+        color: Colors.redAccent.withValues(alpha: 0.15),
+        border: Border.all(color: Colors.redAccent.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -21,16 +19,16 @@ class RustBadge extends StatelessWidget {
             width: 7,
             height: 7,
             decoration: const BoxDecoration(
-              color: Color(0xFFCE412B),
               shape: BoxShape.circle,
+              color: Colors.redAccent,
             ),
           ),
           const SizedBox(width: 6),
           const Text(
             'Rust',
             style: TextStyle(
-              color: Color(0xFFCE412B),
-              fontSize: 14,
+              fontSize: 16,
+              color: Colors.redAccent,
               fontWeight: FontWeight.bold,
             ),
           ),
