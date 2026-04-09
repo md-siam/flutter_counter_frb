@@ -47,4 +47,6 @@ app.*.map.json
 # Rust generated files
 /android/app/src/main/jniLibs
 ios/librust_lib.a
+ios/Runner/librust_lib.a
 macos/librust_lib.dylib
+macos/Runner/librust_lib.dylib

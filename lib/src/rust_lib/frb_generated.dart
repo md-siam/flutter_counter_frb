@@ -29,8 +29,12 @@ typedef _ResetDart = int Function();
 ffi.DynamicLibrary _loadLib() {
   if (Platform.isAndroid) {
     return ffi.DynamicLibrary.open('librust_lib.so');
-  } else if (Platform.isIOS || Platform.isMacOS) {
+  } else if (Platform.isIOS) {
+    // Static lib is linked into the app binary at compile time.
+    // process() looks up symbols from the running executable itself.
     return ffi.DynamicLibrary.process();
+  } else if (Platform.isMacOS) {
+    return ffi.DynamicLibrary.open('librust_lib.dylib');
   } else if (Platform.isWindows) {
     return ffi.DynamicLibrary.open('rust_lib.dll');
   } else if (Platform.isLinux) {
