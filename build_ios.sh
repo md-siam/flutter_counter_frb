@@ -17,10 +17,11 @@ echo "📦 Building Rust library for iOS..."
 
 cd "$RUST_DIR"
 
-rustup target add \
-  aarch64-apple-ios \
-  aarch64-apple-ios-sim \
-  x86_64-apple-ios
+# Add Rust targets if not already installed
+# rustup target add \
+#   aarch64-apple-ios \
+#   aarch64-apple-ios-sim \
+#   x86_64-apple-ios
 
 # Build a fat/universal static lib (device + simulator)
 cargo lipo --release --targets aarch64-apple-ios,x86_64-apple-ios

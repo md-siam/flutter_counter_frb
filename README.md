@@ -73,13 +73,19 @@ cargo --version
 rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 ```
 
-4. Add `iOS` and `MacOS` targets:
+4. Add `iOS` targets:
 
 ```bash
 rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
 ```
 
-5. To check all the `rustup` targets:
+5. Add `MacOS` targets:
+
+```bash
+rustup target add aarch64-apple-darwin x86_64-apple-darwin
+```
+
+6. To check all the `rustup` targets:
 
 ```bash
 rustup show

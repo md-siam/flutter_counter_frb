@@ -19,9 +19,9 @@ echo "📦 Building Rust library for macOS..."
 cd "$RUST_DIR"
 
 # Add targets if not already installed
-rustup target add \
-  aarch64-apple-darwin \
-  x86_64-apple-darwin
+# rustup target add \
+#   aarch64-apple-darwin \
+#   x86_64-apple-darwin
 
 # Build for both Apple Silicon and Intel
 cargo build --release --target aarch64-apple-darwin
