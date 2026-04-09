@@ -67,16 +67,22 @@ rustc --version
 cargo --version
 ```
 
-3. Add Android targets:
+3. Add `Android` targets:
 
 ```bash
 rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 ```
 
-4. Add iOS and MacOS targets:
+4. Add `iOS` and `MacOS` targets:
 
 ```bash
 rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
+```
+
+5. To check all the `rustup` targets:
+
+```bash
+rustup show
 ```
 
 <span style="color: red;">\*\* Note: Avoid installing **`rustc`** through **`homebrew`**</span>
