@@ -38,16 +38,29 @@ android {
         }
     }
 
-    // For running .so files build due to rust
+    // ─── Rust FFI Native Libraries ───────────────────────────────────────────────
+    //
     sourceSets {
         getByName("main") {
+            // Tell Gradle where to find the pre-compiled Rust .so files.
+            // Without this, the .so files would not be packaged into the APK/AAB
+            // and the app would throw an UnsatisfiedLinkError at runtime.
             jniLibs.srcDirs("src/main/jniLibs")
         }
     }
 
-    // For running .so files build due to rust
     defaultConfig {
         ndk {
+            // Restrict the APK to only include .so files for these ABI targets.
+            // This prevents Gradle from packaging unnecessary architectures,
+            // keeping the APK size minimal.
+            //
+            // arm64-v8a   → Required for all modern 64-bit Android devices
+            // armeabi-v7a → Required for legacy 32-bit ARM devices (Android < 5.0 era)
+            // x86_64      → Required for Android emulators on Linux and macOS (Intel/AMD)
+            //
+            // Note: x86 (32-bit) is intentionally excluded — emulators now default
+            // to x86_64 and physical x86 Android devices are extremely rare.
             abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86_64")
         }
     }
