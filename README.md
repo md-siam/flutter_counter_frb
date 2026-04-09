@@ -73,6 +73,12 @@ cargo --version
 rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
 ```
 
+4. Add iOS and MacOS targets:
+
+```bash
+rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
+```
+
 <span style="color: red;">\*\* Note: Avoid installing **`rustc`** through **`homebrew`**</span>
 
 ---

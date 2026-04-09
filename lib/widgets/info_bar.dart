@@ -45,13 +45,15 @@ class _InfoCell extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 13,
-              letterSpacing: 1,
-              color: Colors.white,
-              fontWeight: FontWeight.w600,
+          FittedBox(
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 13,
+                letterSpacing: 1,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
           const SizedBox(height: 3),
