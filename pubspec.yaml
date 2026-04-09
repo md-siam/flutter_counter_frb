@@ -1,0 +1,22 @@
+name: flutter_counter_frb
+description: A Flutter counter app powered by Rust via flutter_rust_bridge and FFI.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  ffi: ^2.2.0
+  flutter_rust_bridge: ^2.12.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,70 @@
+# ─── Rust Build Artifacts ─────────────────────────────────────────────────────
+
+# Compiled output (debug and release builds)
+target/
+
+# Cargo lock file for libraries (keep for binaries, ignore for libs)
+# Remove this line if you want reproducible dependency versions in CI
+Cargo.lock
+
+# ─── IDE & Editor ─────────────────────────────────────────────────────────────
+
+# JetBrains (RustRover, CLion, IntelliJ)
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Vim / Neovim
+*.swp
+*.swo
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ─── OS Files ─────────────────────────────────────────────────────────────────
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+.directory
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# ─── Rust Specific ────────────────────────────────────────────────────────────
+
+# Benchmarks output
+criterion/
+
+# Coverage reports
+coverage/
+lcov.info
+tarpaulin-report.html
+
+# Flamegraph profiling
+perf.data
+perf.data.old
+flamegraph.svg
+
+# cargo-fuzz artifacts
+fuzz/target/
+fuzz/corpus/
+fuzz/artifacts/
+
+# ─── Generated Files ──────────────────────────────────────────────────────────
+
+# cbindgen generated C headers
+*.h
+
+# bindgen generated Rust bindings
+bindings.rs
