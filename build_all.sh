@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# build_all.sh — Interactive Codegen + Multi-platform Builder
+# build_all.sh — Codegen (optional) + Platform build loop
 # ─────────────────────────────────────────────────────────────────────────────
 
 set -euo pipefail
@@ -14,15 +14,6 @@ LINUX_OUT_DIR="$ROOT_DIR/linux"
 # ─────────────────────────────────────────────
 # STEP 1: CODEGEN OPTION
 # ─────────────────────────────────────────────
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "⚙️  Rust Bridge Codegen "
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "1) Run Codegen"
-echo "2) Skip Codegen"
-echo ""
-
-read -p "Enter choice [1-2]: " codegen_choice
-
 run_codegen() {
   echo ""
   echo "🚀 STARTING CODEGEN..."
@@ -41,35 +32,6 @@ run_codegen() {
 
   echo "✅ Codegen complete!"
 }
-
-case $codegen_choice in
-  1)
-    run_codegen
-    ;;
-  2)
-    echo "⏭️ Skipping codegen..."
-    ;;
-  *)
-    echo "❌ Invalid choice"
-    exit 1
-    ;;
-esac
-
-# ─────────────────────────────────────────────
-# STEP 2: PLATFORM SELECTION
-# ─────────────────────────────────────────────
-echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "📱 Select platform to build:"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "1) Android"
-echo "2) iOS"
-echo "3) macOS"
-echo "4) Linux"
-echo "5) All"
-echo ""
-
-read -p "Enter choice [1-5]: " choice
 
 # ─────────────────────────────────────────────
 # BUILD FUNCTIONS
@@ -143,35 +105,74 @@ build_linux() {
 }
 
 # ─────────────────────────────────────────────
-# EXECUTION
+# STEP 1: CODEGEN OPTION (ONCE)
 # ─────────────────────────────────────────────
-
-case $choice in
-  1)
-    build_android
-    ;;
-  2)
-    build_ios
-    ;;
-  3)
-    build_macos
-    ;;
-  4)
-    build_linux
-    ;;
-  5)
-    build_android
-    build_ios
-    build_macos
-    build_linux
-    ;;
-  *)
-    echo "❌ Invalid choice"
-    exit 1
-    ;;
-esac
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "🎉 ALL DONE!"
+echo "⚙️ Codegen Setup"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "1) Run Codegen"
+echo "2) Skip Codegen"
+echo ""
+
+read -p "Enter choice [1-2]: " cg_choice
+
+if [[ "$cg_choice" == "1" ]]; then
+  run_codegen
+else
+  echo "⏭️ Skipping codegen..."
+fi
+
+# ─────────────────────────────────────────────
+# STEP 2: PLATFORM LOOP
+# ─────────────────────────────────────────────
+
+while true; do
+  echo ""
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "📱 Select platform to build:"
+  echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  echo "1) Android"
+  echo "2) iOS"
+  echo "3) macOS"
+  echo "4) Linux"
+  echo "5) All"
+  echo "6) Exit"
+  echo ""
+
+  read -p "Enter choice [1-6]: " choice
+
+  case $choice in
+    1)
+      build_android
+      ;;
+    2)
+      build_ios
+      ;;
+    3)
+      build_macos
+      ;;
+    4)
+      build_linux
+      ;;
+    5)
+      build_android
+      build_ios
+      build_macos
+      build_linux
+      ;;
+    6)
+      echo "👋 Exiting..."
+      break
+      ;;
+    *)
+      echo "❌ Invalid choice. Try again."
+      ;;
+  esac
+done
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "🎉 Done"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
