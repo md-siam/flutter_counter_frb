@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'src/rust_lib/frb_generated.dart';
+import 'rust_lib/api.dart';
 import 'widgets/counter_button.dart';
 import 'widgets/info_bar.dart';
 import 'widgets/rust_badge.dart';
@@ -27,8 +27,6 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
 
   static const _longPressInitialDelay = Duration(milliseconds: 400);
 
-  final _rust = RustLib.instance;
-
   @override
   void initState() {
     super.initState();
@@ -41,7 +39,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
       CurvedAnimation(parent: _animController, curve: Curves.easeOut),
     );
 
-    _rust.getCounter().then((v) {
+    getCounter().then((v) {
       if (mounted) {
         setState(() {
           _count = v;
@@ -64,19 +62,19 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
   }
 
   Future<void> _increment() async {
-    final v = await _rust.increment();
+    final v = await increment();
     _pulse();
     if (mounted) setState(() => _count = v);
   }
 
   Future<void> _decrement() async {
-    final v = await _rust.decrement();
+    final v = await decrement();
     _pulse();
     if (mounted) setState(() => _count = v);
   }
 
   Future<void> _reset() async {
-    final v = await _rust.reset();
+    final v = await reset();
     if (mounted) setState(() => _count = v);
   }
 
@@ -129,7 +127,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Powered by: \n' 'ffi + flutter_rust_bridge',
+                        'Powered by: \nffi + flutter_rust_bridge',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,

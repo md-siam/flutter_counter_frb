@@ -1,0 +1,9 @@
+# flutter_rust_bridge.yaml
+rust_input: crate::api
+rust_root: rust/
+dart_output: lib/rust_lib
+
+# Disable web platform — only native FFI targets are needed
+# (Android, iOS, macOS, Linux, Windows)
+# This prevents frb_generated.web.dart from being generated
+web: false
