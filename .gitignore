@@ -52,3 +52,4 @@ ios/librust_lib.a
 ios/Runner/librust_lib.a
 macos/librust_lib.dylib
 macos/Runner/librust_lib.dylib
+linux/librust_lib.so
