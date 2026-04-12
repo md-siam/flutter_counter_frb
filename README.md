@@ -99,22 +99,63 @@ rustup show
 
 ```bash
 cargo install flutter_rust_bridge_codegen
+flutter_rust_bridge_codegen --version
 ```
+
+This will globally install the `flutter_rust_bridge_codegen` into your system
 
 ---
 
 ## Step 2 — Generate Dart bindings from Rust
 
-> Skip this if you want to use the hand-written `frb_generated.dart` provided.
+Create a file in the app directory with the name: `flutter_rust_bridge.yaml`, and paste these code:
 
-```bash
-cd flutter_counter_frb
-flutter_rust_bridge_codegen generate \
-  --rust-input rust/src/lib.rs \
-  --dart-output lib/src/rust_lib/frb_generated.dart
+```yaml
+rust_input: crate::api
+rust_root: rust/
+dart_output: lib/rust_lib
+
+# Disable web platform — only native FFI targets are needed
+# (Android, iOS, macOS, Linux, Windows)
+# This prevents frb_generated.web.dart from being generated
+web: false
 ```
 
-This reads your `pub fn` signatures in Rust and emits matching Dart async functions.
+Create another file with the name: `codegen.sh`, and paste these code:
+
+```bash
+set -euo pipefail
+
+echo "🗑️  Removing existing generated files..."
+rm -f lib/rust_lib/frb_generated.dart
+rm -f lib/rust_lib/frb_generated.io.dart
+rm -f lib/rust_lib/frb_generated.web.dart
+rm -rf .dart_tool/
+
+echo "⚙️  Running flutter_rust_bridge_codegen..."
+flutter_rust_bridge_codegen generate
+
+flutter pub get
+
+echo "✅ Codegen complete!"
+```
+
+Make codegen.sh executable:
+
+```bash
+chmod +x codegen.sh
+./codegen.sh
+```
+
+This reads your `pub fn` signatures in Rust and emits matching Dart async functions in `rust_lib` directory.
+
+```
+lib
+ └─ rust_lib
+  ├── api.dart
+  ├── frb_generated.dart
+  └── frb_generated.io.dart
+```
 
 ---
 
