@@ -164,7 +164,6 @@ lib
 ### Android:
 
 ```bash
-mkdir -p android/app/src/main/jniLibs/{arm64-v8a,armeabi-v7a,x86_64}
 chmod +x build_android.sh
 ./build_android.sh
 ```
