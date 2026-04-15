@@ -161,7 +161,7 @@ lib
 
 ## Step 3 — Build the Rust native library
 
-### Android:
+### 🤖 Android:
 
 ```bash
 chmod +x build_android.sh
@@ -170,16 +170,175 @@ chmod +x build_android.sh
 
 This places `.so` files into `android/app/src/main/jniLibs/`.
 
-### iOS:
+### 🍎 iOS:
 
-```bash
-chmod +x build_ios.sh
-./build_ios.sh
+#### Part 1 — Rust crate setup
+
+1. **Update `Cargo.toml` crate types**
+
+```toml
+[lib]
+name = "rust_lib"
+crate-type = ["lib", "staticlib", "cdylib"]
 ```
 
-Then in Xcode: **Runner → Build Phases → Link Binary with Libraries → + → Add librust_lib.a**
+2. **Install cargo-xcode and generate Xcode project**
 
-### Linux:
+```bash
+cargo install cargo-xcode
+cd rust
+cargo xcode
+```
+
+---
+
+#### Part 2 — Xcode: add Rust as subproject
+
+3. **Open iOS workspace**
+
+```bash
+open ios/Runner.xcworkspace
+```
+
+4. **Add `rust_lib.xcodeproj` as subproject**
+
+- Right-click Runner → Add Files → select `rust/rust_lib.xcodeproj`
+
+---
+
+#### Part 3 — Build Phases
+
+5. **Add dependency**
+
+- Add `rust_lib-staticlib` in _Dependencies_
+
+6. **Link library**
+
+- Add `librust_lib_static.a` in _Link Binary With Libraries_
+
+---
+
+#### Part 4 — Headers & Swift
+
+7. **Run codegen and copy header**
+
+```bash
+./codegen.sh
+cp rust/target/bindings.h ios/Runner/bridge_generated.h
+```
+
+8. **Update bridging header**
+
+```c
+#import "GeneratedPluginRegistrant.h"
+#import "bridge_generated.h"
+```
+
+9. **Call dummy method in AppDelegate.swift**
+
+```swift
+let dummy = dummy_method_to_enforce_bundling()
+print(dummy)
+```
+
+---
+
+#### Part 5 — Build Settings
+
+10. **Set Strip Style**
+
+- Use: `Non-Global Symbols`
+
+11. **Run app**
+
+```bash
+flutter run -d ios
+```
+
+### 💻 MacOS:
+
+#### Part 1 — Rust setup
+
+1. **Update Cargo.toml**
+
+```toml
+crate-type = ["lib", "staticlib", "cdylib"]
+```
+
+```bash
+cd rust && cargo xcode
+```
+
+---
+
+#### Part 2 — Xcode setup
+
+2. **Open workspace**
+
+```bash
+open macos/Runner.xcworkspace
+```
+
+3. **Fix install name base**
+
+- Set: `@executable_path/../Frameworks/`
+
+---
+
+#### Part 3 — Build Phases
+
+4. **Add dependency**
+
+- Add `rust_lib-cdylib`
+
+5. **Link library**
+
+- Add `rust_lib.dylib`
+- Also add to _Bundle Frameworks_
+
+---
+
+#### Part 4 — Headers & Swift
+
+6. **Generate header**
+
+```bash
+./codegen.sh
+cp rust/target/bindings.h macos/Runner/bridge_generated.h
+```
+
+7. **Set bridging header**
+
+- `Runner/bridge_generated.h`
+
+8. **Call dummy method**
+
+```swift
+let dummy = dummy_method_to_enforce_bundling()
+print(dummy)
+```
+
+---
+
+#### Part 5 — Rpath
+
+9. **Runpath Search Paths**
+
+- `@executable_path/../Frameworks`
+
+10. **Fix dylib install name**
+
+```bash
+install_name_tool -id   @rpath/librust_lib.dylib   macos/Runner/librust_lib.dylib
+```
+
+11. **Run app**
+
+```bash
+flutter clean && flutter run -d macos
+```
+
+### 🐧 Linux:
 
 ```bash
 chmod +x build_linux.sh

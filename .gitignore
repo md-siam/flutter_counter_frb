@@ -46,6 +46,7 @@ app.*.map.json
 
 # Rust generated files
 lib/rust_lib
+rust/rust_lib.xcodeproj
 rust/src/frb_generated.rs
 /android/app/src/main/jniLibs
 ios/librust_lib.a
