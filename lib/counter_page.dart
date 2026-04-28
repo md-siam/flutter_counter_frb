@@ -200,7 +200,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
             ),
             const SizedBox(height: 16),
             TextButton(
-              onPressed: _reset,
+              onPressed: _count == 0 ? null : _reset,
               child: const Text(
                 'RESET',
                 style: TextStyle(
