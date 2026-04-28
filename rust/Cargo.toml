@@ -8,9 +8,9 @@ name = "rust_lib"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
-log = "0.4.29"
-android_logger = "0.15.1"
-flutter_rust_bridge = "=2.12.0"
+log = "0.4"
+android_logger = "0.14"
+flutter_rust_bridge = "2"
 
 [profile.release]
 lto = true

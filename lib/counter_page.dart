@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import 'rust_lib/api.dart';
+import 'src/rust_lib/frb_generated.dart';
 import 'widgets/counter_button.dart';
 import 'widgets/info_bar.dart';
 import 'widgets/rust_badge.dart';
@@ -14,15 +14,34 @@ class CounterPage extends StatefulWidget {
   State<CounterPage> createState() => _CounterPageState();
 }
 
-class _CounterPageState extends State<CounterPage> {
+class _CounterPageState extends State<CounterPage> with SingleTickerProviderStateMixin {
   int _count = 0;
   bool _loading = true;
+
+  late AnimationController _animController;
+  late Animation<double> _scaleAnim;
+
+  Timer? _longPressTimer;
+
+  static const _longPressInterval = Duration(milliseconds: 100);
+
+  static const _longPressInitialDelay = Duration(milliseconds: 400);
+
+  final _rust = RustLib.instance;
 
   @override
   void initState() {
     super.initState();
 
-    getCounter().then((v) {
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 180),
+    );
+    _scaleAnim = Tween<double>(begin: 1.0, end: 1.18).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
+    );
+
+    _rust.getCounter().then((v) {
       if (mounted) {
         setState(() {
           _count = v;
@@ -32,19 +51,50 @@ class _CounterPageState extends State<CounterPage> {
     });
   }
 
+  @override
+  void dispose() {
+    _cancelLongPress();
+    _animController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pulse() async {
+    await _animController.forward();
+    await _animController.reverse();
+  }
+
   Future<void> _increment() async {
-    final v = await increment();
+    final v = await _rust.increment();
+    _pulse();
     if (mounted) setState(() => _count = v);
   }
 
   Future<void> _decrement() async {
-    final v = await decrement();
+    final v = await _rust.decrement();
+    _pulse();
     if (mounted) setState(() => _count = v);
   }
 
   Future<void> _reset() async {
-    final v = await reset();
+    final v = await _rust.reset();
     if (mounted) setState(() => _count = v);
+  }
+
+  void _startLongPress(Future<void> Function() action) {
+    action();
+
+    Future.delayed(_longPressInitialDelay, () {
+      if (!mounted) return;
+
+      _longPressTimer = Timer.periodic(_longPressInterval, (_) {
+        action();
+      });
+    });
+  }
+
+  void _cancelLongPress() {
+    _longPressTimer?.cancel();
+    _longPressTimer = null;
   }
 
   Color get _countColor {
@@ -79,7 +129,7 @@ class _CounterPageState extends State<CounterPage> {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Powered by: \nffi + flutter_rust_bridge',
+                        'Powered by: \n' 'ffi + flutter_rust_bridge',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -94,33 +144,36 @@ class _CounterPageState extends State<CounterPage> {
             const Spacer(),
             _loading
                 ? const CircularProgressIndicator(color: Colors.tealAccent)
-                : Column(
-                    children: [
-                      Text(
-                        _count.toString(),
-                        style: TextStyle(
-                          color: _countColor,
-                          fontSize: 96,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -4,
-                          height: 1,
+                : ScaleTransition(
+                    scale: _scaleAnim,
+                    child: Column(
+                      children: [
+                        Text(
+                          _count.toString(),
+                          style: TextStyle(
+                            color: _countColor,
+                            fontSize: 96,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -4,
+                            height: 1,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _count == 0
-                            ? 'zero'
-                            : _count > 0
-                                ? 'positive'
-                                : 'negative',
-                        style: TextStyle(
-                          color: _countColor,
-                          fontSize: 16,
-                          letterSpacing: 2,
-                          fontWeight: FontWeight.w600,
+                        const SizedBox(height: 8),
+                        Text(
+                          _count == 0
+                              ? 'zero'
+                              : _count > 0
+                                  ? 'positive'
+                                  : 'negative',
+                          style: TextStyle(
+                            color: _countColor,
+                            fontSize: 16,
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
             const SizedBox(height: 48),
             Padding(
@@ -131,12 +184,16 @@ class _CounterPageState extends State<CounterPage> {
                     label: '−',
                     color: Colors.redAccent,
                     onTap: _decrement,
+                    onLongPressStart: () => _startLongPress(_decrement),
+                    onLongPressEnd: _cancelLongPress,
                   ),
                   const SizedBox(width: 16),
                   CounterButton(
                     label: '+',
                     color: Colors.tealAccent,
                     onTap: _increment,
+                    onLongPressStart: () => _startLongPress(_increment),
+                    onLongPressEnd: _cancelLongPress,
                   ),
                 ],
               ),
