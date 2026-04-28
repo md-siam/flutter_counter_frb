@@ -139,6 +139,24 @@ chmod +x build_ios.sh
 
 Then in Xcode: **Runner → Build Phases → Link Binary with Libraries → + → Add librust_lib.a**
 
+### macOS
+
+```bash
+chmod +x build_macos.sh
+./build_macos.sh
+open macos/Runner.xcworkspace
+```
+
+**In Xcode:**
+
+1. Add _librust_lib.dylib_ to your Xcode project under\
+   Runner → Build Phases → Link Binary with Libraries
+
+2. Change _librust_lib.dylib_ Embed status in\
+   General → Frameworks, Libraries, and Embedded Content → Embed & Sign
+
+3. Run from _VSCode_ or _Android Studio_
+
 ### Linux
 
 ```bash
