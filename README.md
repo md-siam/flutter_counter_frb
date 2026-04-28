@@ -11,19 +11,21 @@ flutter_counter_frb/
 ├── rust/                        # Rust crate
 │   ├── Cargo.toml
 │   └── src/
-│       └── lib.rs               # Counter logic (increment / decrement / reset)
+│       ├── api.rs               # Counter logic (increment / decrement / reset)
+│       └── lib.rs               # Start point, mod api.rs
 │
 ├── lib/
 │   ├── main.dart                # Flutter app entry point
 │   ├── counter_page.dart        # UI — calls Rust via FFI
 │   ├── widgets                  # Widgets
-│   │    ├── counter_button.dart
-│   │    ├── info_bar.dart
-│   │    └── rust_badge.dart
-│   └── src/rust_lib/
-│       ├── frb_generated.dart   # FFI bindings (replace with codegen output)
-│       └── api.dart             # Re-export for clean imports
-│
+│   └── src/
+│       ├── loader
+│       │   └── load_rust_library.dart   # Load rust library first at main()
+│       └── rust                         # Generated folder
+│           ├── api.dart                 # Re-export for clean imports
+│           ├── frb_generated.dart
+│           └── frb_generated.io.dart
+│     
 ├── android/app/
 │   ├── build.gradle             # jniLibs config
 │   └── src/main/jniLibs/        # .so files go here after build_android.sh
