@@ -46,7 +46,7 @@ app.*.map.json
 
 # Rust generated files
 .metadata
-lib/rust_lib
+lib/src/rust
 rust/rust_lib.xcodeproj
 rust/src/frb_generated.rs
 /android/app/src/main/jniLibs

@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'counter_page.dart';
+import 'src/rust/frb_generated.dart';
+import 'src/loader/load_rust_library.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await RustLib.init(
+    externalLibrary: loadRustLibrary(),
+  );
+
   runApp(const CounterApp());
 }
 
