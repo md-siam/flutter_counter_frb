@@ -139,13 +139,20 @@ chmod +x build_ios.sh
 
 Then in Xcode: **Runner → Build Phases → Link Binary with Libraries → + → Add librust_lib.a**
 
-### Desktop (Linux / macOS / Windows)
+### Linux
 
 ```bash
-cd rust
-cargo build --release
-# Outputs to rust/target/release/librust_lib.{so,dylib,dll}
-# Copy alongside your Flutter executable or into the right system path
+chmod +x build_linux.sh
+./build_linux.sh
+```
+
+Next: Add the following to your linux/CMakeLists.txt
+
+```txt
+  # For initializing rust library
+  set(RUST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/../linux/librust_lib.so")
+  install(FILES "${RUST_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
+  target_link_libraries(${BINARY_NAME} PRIVATE "${RUST_LIB}")
 ```
 
 ---
