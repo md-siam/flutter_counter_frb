@@ -49,6 +49,7 @@ app.*.map.json
 lib/src/rust
 rust/rust_lib.xcodeproj
 rust/src/frb_generated.rs
+rust/platform-build
 /android/app/src/main/jniLibs
 ios/librust_lib.a
 ios/Runner/librust_lib.a
