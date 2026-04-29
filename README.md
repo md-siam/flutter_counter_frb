@@ -1,6 +1,25 @@
-# flutter_counter_frb
+# Flutter Counter FRB
 
+<img align="right" src="screenshots/play_store_512.png" height="190"></img>
 A Flutter counter app whose business logic lives in **Rust**, called from Dart via **FFI** and **flutter_rust_bridge v2**.
+
+How the FFI bridge works:
+
+```
+Dart (counter_page.dart)
+    │
+    │  calls async method
+    ▼
+RustLib.instance.increment()        ← frb_generated.dart
+    │
+    │  DynamicLibrary.lookupFunction
+    ▼
+librust_lib.so / .dylib / .dll      ← compiled Rust
+    │
+    │  #[no_mangle] pub extern "C" fn increment() -> i64
+    ▼
+COUNTER (Mutex<i64>)                ← Rust global state
+```
 
 ---
 
@@ -59,6 +78,7 @@ flutter_counter_frb/
 | Rust + Cargo        | https://rustup.rs                            |
 | Flutter SDK ≥ 3.10  | https://docs.flutter.dev/get-started/install |
 | cargo-ndk (Android) | `cargo install cargo-ndk`                    |
+| Rust → Flutter code | `cargo install flutter_rust_bridge_codegen`  |
 | Android NDK         | via Android Studio → SDK Manager             |
 | cargo-lipo (iOS)    | `cargo install cargo-lipo`                   |
 | Xcode (iOS/macOS)   | Mac App Store                                |
@@ -80,6 +100,8 @@ rustc --version
 cargo --version
 ```
 
+<span style="color: red;">\*\* Note: Avoid installing **`rustc`** through **`homebrew`**</span>
+
 3. Add `Android` targets:
 
 ```bash
@@ -99,6 +121,7 @@ rustup target add aarch64-apple-darwin x86_64-apple-darwin
 ```
 
 6. To check all the `rustup` targets:
+   <img align="right" src="screenshots/rustup-show.png" width="350"></img>
 
 ```bash
 rustup show
@@ -214,24 +237,4 @@ Next: Add the following to your linux/CMakeLists.txt
 ```bash
 flutter pub get
 flutter run
-```
-
----
-
-## How the FFI bridge works
-
-```
-Dart (counter_page.dart)
-    │
-    │  calls async method
-    ▼
-RustLib.instance.increment()        ← frb_generated.dart
-    │
-    │  DynamicLibrary.lookupFunction
-    ▼
-librust_lib.so / .dylib / .dll      ← compiled Rust
-    │
-    │  #[no_mangle] pub extern "C" fn increment() -> i64
-    ▼
-COUNTER (Mutex<i64>)                ← Rust global state
 ```
