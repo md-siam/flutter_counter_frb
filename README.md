@@ -143,7 +143,7 @@ cargo install flutter_rust_bridge_codegen
 
 ---
 
-## Step 1 — Generate Dart bindings from Rust
+## Step 1: Generate Dart bindings from Rust
 
 Create a file name: `flutter_rust_bridge.yaml` inside the file copy this config code:
 
@@ -169,7 +169,7 @@ flutter_rust_bridge_codegen generate
 
 ---
 
-## Step 2 — Build native library for different platforms
+## Step 2: Build native library for different platforms
 
 ### Android
 
@@ -238,7 +238,7 @@ Next: Add the following to your linux/CMakeLists.txt
 
 ---
 
-## Step 3 — Run the Flutter app
+## Step 3: Run the Flutter app
 
 ```bash
 flutter pub get
