@@ -6,7 +6,7 @@ A Flutter counter app whose business logic lives in **Rust**, called from Dart v
 
 ## Project Structure
 
-```
+```tree
 flutter_counter_frb/
 ├── rust/                        # Rust crate
 │   ├── Cargo.toml
@@ -33,9 +33,20 @@ flutter_counter_frb/
 │       ├── armeabi-v7a/
 │       └── x86_64/
 │
-├── ios/                         # librust_lib.a goes here after build_ios.sh
+├── ios/
+│   ├── Flutter
+│   ├── Runner
+│   │   ├── AppDelegate.swift         # Use the `dummy` code from bridge_generated.h
+│   │   ├── bridge_generated.h        # Generated C code from `rust` folder
+│   │   └── Runner-Bridging-Header.h  # Imports "bridge_generated.h" here
+│   ├── Runner.xcodeproj
+│   └── Runner.xcworkspace
+│
 ├── build_android.sh
 ├── build_ios.sh
+├── build_linux.sh
+├── build_macos.sh
+├── flutter_rust_bridge.yaml        # flutter_rust_bridge_codegen config file
 └── pubspec.yaml
 ```
 
@@ -95,9 +106,7 @@ rustup show
 
 <span style="color: red;">\*\* Note: Avoid installing **`rustc`** through **`homebrew`**</span>
 
----
-
-## Step 1 — Install flutter_rust_bridge_codegen
+7. Install `flutter_rust_bridge_codegen`
 
 ```bash
 cargo install flutter_rust_bridge_codegen
@@ -105,22 +114,33 @@ cargo install flutter_rust_bridge_codegen
 
 ---
 
-## Step 2 — Generate Dart bindings from Rust
+## Step 1 — Generate Dart bindings from Rust
 
-> Skip this if you want to use the hand-written `frb_generated.dart` provided.
+Create a file name: `flutter_rust_bridge.yaml` inside the file copy this config code:
 
-```bash
-cd flutter_counter_frb
-flutter_rust_bridge_codegen generate \
-  --rust-input rust/src/lib.rs \
-  --dart-output lib/src/rust_lib/frb_generated.dart
+```yaml
+rust_root: rust/
+rust_input: crate::api
+dart_output: lib/src/rust
+c_output: rust/bridge_generated.h
+dart_format_line_length: 100
+
+# It should be true for properly bridge_generated.h generate
+full_dep: true
+
+# This prevents frb_generated.web.dart from being generated
+web: false
 ```
 
-This reads your `pub fn` signatures in Rust and emits matching Dart async functions.
+Now, simply run this command app directory:
+
+```bash
+flutter_rust_bridge_codegen generate
+```
 
 ---
 
-## Step 3 — Build the Rust native library
+## Step 2 — Build the Rust native library
 
 ### Android
 
@@ -189,7 +209,7 @@ Next: Add the following to your linux/CMakeLists.txt
 
 ---
 
-## Step 4 — Run the Flutter app
+## Step 3 — Run the Flutter app
 
 ```bash
 flutter pub get
@@ -215,28 +235,3 @@ librust_lib.so / .dylib / .dll      ← compiled Rust
     ▼
 COUNTER (Mutex<i64>)                ← Rust global state
 ```
-
----
-
-## Adding more crates.io packages
-
-1. Add the dependency to `rust/Cargo.toml`:
-
-   ```toml
-   [dependencies]
-   uuid = { version = "1", features = ["v4"] }
-   ```
-
-2. Use it inside `rust/src/lib.rs`:
-
-   ```rust
-   use uuid::Uuid;
-
-   pub fn generate_id() -> String {
-       Uuid::new_v4().to_string()
-   }
-   ```
-
-3. Re-run codegen → rebuild the native lib → `flutter run`.
-
-Cargo handles all dependency resolution automatically. Only the _boundary_ functions need `pub` — everything internal stays pure Rust.
