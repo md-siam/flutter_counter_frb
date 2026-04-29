@@ -1,8 +1,11 @@
-rust_input: crate::api
 rust_root: rust/
-dart_output: lib/rust_lib
+rust_input: crate::api
+dart_output: lib/src/rust
+c_output: rust/bridge_generated.h
+dart_format_line_length: 100
 
-# Disable web platform — only native FFI targets are needed
-# (Android, iOS, macOS, Linux, Windows)
+# It should be true for properly bridge_generated.h generate
+full_dep: true
+
 # This prevents frb_generated.web.dart from being generated
 web: false

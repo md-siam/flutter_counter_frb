@@ -10,8 +10,6 @@
 
 set -euo pipefail
 
-mkdir -p android/app/src/main/jniLibs/{arm64-v8a,armeabi-v7a,x86_64}
-
 RUST_DIR="$(cd "$(dirname "$0")/rust" && pwd)"
 OUT_DIR="$(cd "$(dirname "$0")/android/app/src/main/jniLibs" && pwd)"
 

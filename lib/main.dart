@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'counter_page.dart';
-import 'rust_lib/frb_generated.dart';
+import 'src/loader/load_library.dart';
+import 'src/rust/frb_generated.dart';
 
-void main() async {
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize the flutter_rust_bridge before any Rust functions are called.
-  // This sets up the FFI bindings and the async runtime on the Rust side.
-  await RustLib.init();
+  await RustLib.init(
+    externalLibrary: loadRustLibrary(),
+  );
+
   runApp(const CounterApp());
 }
 

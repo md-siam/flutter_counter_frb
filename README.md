@@ -1,28 +1,49 @@
-# flutter_counter_frb
+# Flutter Counter FRB
 
+<img align="right" src="screenshots/play_store_512.png" height="190"></img>
 A Flutter counter app whose business logic lives in **Rust**, called from Dart via **FFI** and **flutter_rust_bridge v2**.
+
+How the FFI bridge works:
+
+```
+Dart (counter_page.dart)
+    │
+    │  calls async method
+    ▼
+RustLib.instance.increment()        ← frb_generated.dart
+    │
+    │  DynamicLibrary.lookupFunction
+    ▼
+librust_lib.so / .dylib / .dll      ← compiled Rust
+    │
+    │  #[no_mangle] pub extern "C" fn increment() -> i64
+    ▼
+COUNTER (Mutex<i64>)                ← Rust global state
+```
 
 ---
 
 ## Project Structure
 
-```
+```tree
 flutter_counter_frb/
 ├── rust/                        # Rust crate
 │   ├── Cargo.toml
 │   └── src/
-│       └── lib.rs               # Counter logic (increment / decrement / reset)
+│       ├── api.rs               # Counter logic (increment / decrement / reset)
+│       └── lib.rs               # Start point, mod api.rs
 │
 ├── lib/
 │   ├── main.dart                # Flutter app entry point
 │   ├── counter_page.dart        # UI — calls Rust via FFI
 │   ├── widgets                  # Widgets
-│   │    ├── counter_button.dart
-│   │    ├── info_bar.dart
-│   │    └── rust_badge.dart
-│   └── src/rust_lib/
-│       ├── frb_generated.dart   # FFI bindings (replace with codegen output)
-│       └── api.dart             # Re-export for clean imports
+│   └── src/
+│       ├── loader
+│       │   └── load_rust_library.dart   # Load rust library first at main()
+│       └── rust                         # Generated folder
+│           ├── api.dart                 # Re-export for clean imports
+│           ├── frb_generated.dart
+│           └── frb_generated.io.dart
 │
 ├── android/app/
 │   ├── build.gradle             # jniLibs config
@@ -31,9 +52,20 @@ flutter_counter_frb/
 │       ├── armeabi-v7a/
 │       └── x86_64/
 │
-├── ios/                         # librust_lib.a goes here after build_ios.sh
+├── ios/
+│   ├── Flutter
+│   ├── Runner
+│   │   ├── AppDelegate.swift         # Use the `dummy` code from bridge_generated.h
+│   │   ├── bridge_generated.h        # Generated C code from `rust` folder
+│   │   └── Runner-Bridging-Header.h  # Imports "bridge_generated.h" here
+│   ├── Runner.xcodeproj
+│   └── Runner.xcworkspace
+│
 ├── build_android.sh
 ├── build_ios.sh
+├── build_linux.sh
+├── build_macos.sh
+├── flutter_rust_bridge.yaml        # flutter_rust_bridge_codegen config file
 └── pubspec.yaml
 ```
 
@@ -46,6 +78,7 @@ flutter_counter_frb/
 | Rust + Cargo        | https://rustup.rs                            |
 | Flutter SDK ≥ 3.10  | https://docs.flutter.dev/get-started/install |
 | cargo-ndk (Android) | `cargo install cargo-ndk`                    |
+| Rust → Flutter code | `cargo install flutter_rust_bridge_codegen`  |
 | Android NDK         | via Android Studio → SDK Manager             |
 | cargo-lipo (iOS)    | `cargo install cargo-lipo`                   |
 | Xcode (iOS/macOS)   | Mac App Store                                |
@@ -67,6 +100,8 @@ rustc --version
 cargo --version
 ```
 
+<span style="color: red;">\*\* Note: Avoid installing **`rustc`** through **`homebrew`**</span>
+
 3. Add `Android` targets:
 
 ```bash
@@ -86,6 +121,7 @@ rustup target add aarch64-apple-darwin x86_64-apple-darwin
 ```
 
 6. To check all the `rustup` targets:
+   <img align="right" src="screenshots/rustup-show.png" width="350"></img>
 
 ```bash
 rustup show
@@ -93,317 +129,112 @@ rustup show
 
 <span style="color: red;">\*\* Note: Avoid installing **`rustc`** through **`homebrew`**</span>
 
----
-
-## Step 1 — Install flutter_rust_bridge_codegen
+7. Install `flutter_rust_bridge_codegen`
 
 ```bash
 cargo install flutter_rust_bridge_codegen
-flutter_rust_bridge_codegen --version
 ```
-
-This will globally install the `flutter_rust_bridge_codegen` into your system
 
 ---
 
-## Step 2 — Generate Dart bindings from Rust
+## Step 1 — Generate Dart bindings from Rust
 
-Create a file in the app directory with the name: `flutter_rust_bridge.yaml`, and paste these code:
+Create a file name: `flutter_rust_bridge.yaml` inside the file copy this config code:
 
 ```yaml
-rust_input: crate::api
 rust_root: rust/
-dart_output: lib/rust_lib
+rust_input: crate::api
+dart_output: lib/src/rust
+c_output: rust/bridge_generated.h
+dart_format_line_length: 100
 
-# Disable web platform — only native FFI targets are needed
-# (Android, iOS, macOS, Linux, Windows)
+# It should be true for properly bridge_generated.h generate
+full_dep: true
+
 # This prevents frb_generated.web.dart from being generated
 web: false
 ```
 
-Create another file with the name: `codegen.sh`, and paste these code:
+Now, simply run this command app directory:
 
 ```bash
-set -euo pipefail
-
-echo "🗑️  Removing existing generated files..."
-rm -f lib/rust_lib/frb_generated.dart
-rm -f lib/rust_lib/frb_generated.io.dart
-rm -f lib/rust_lib/frb_generated.web.dart
-rm -rf .dart_tool/
-
-echo "⚙️  Running flutter_rust_bridge_codegen..."
 flutter_rust_bridge_codegen generate
-
-flutter pub get
-
-echo "✅ Codegen complete!"
-```
-
-Make codegen.sh executable:
-
-```bash
-chmod +x codegen.sh
-./codegen.sh
-```
-
-This reads your `pub fn` signatures in Rust and emits matching Dart async functions in `rust_lib` directory.
-
-```
-lib
- └─ rust_lib
-  ├── api.dart
-  ├── frb_generated.dart
-  └── frb_generated.io.dart
 ```
 
 ---
 
-## Step 3 — Build the Rust native library
+## Step 2 — Build native library for different platforms
 
-### 🤖 Android:
+### Android
 
 ```bash
+mkdir -p android/app/src/main/jniLibs/{arm64-v8a,armeabi-v7a,x86_64}
 chmod +x build_android.sh
 ./build_android.sh
 ```
 
 This places `.so` files into `android/app/src/main/jniLibs/`.
 
-### 🍎 iOS:
-
-#### Part 1 — Rust crate setup
-
-1. **Update `Cargo.toml` crate types**
-
-```toml
-[lib]
-name = "rust_lib"
-crate-type = ["lib", "staticlib", "cdylib"]
-```
-
-2. **Install cargo-xcode and generate Xcode project**
+### iOS
 
 ```bash
-cargo install cargo-xcode
-cd rust
-cargo xcode
+chmod +x build_ios.sh
+./build_ios.sh
+open is/Runner.xcworkspace
 ```
 
----
+**In Xcode:**
 
-#### Part 2 — Xcode: add Rust as subproject
-
-3. **Open iOS workspace**
-
-```bash
-open ios/Runner.xcworkspace
-```
-
-4. **Add `rust_lib.xcodeproj` as subproject**
-
-- Right-click Runner → Add Files → select `rust/rust_lib.xcodeproj`
-
----
-
-#### Part 3 — Build Phases
-
-5. **Add dependency**
-
-- Add `rust_lib-staticlib` in _Dependencies_
-
-6. **Link library**
-
-- Add `librust_lib_static.a` in _Link Binary With Libraries_
-
----
-
-#### Part 4 — Headers & Swift
-
-7. **Run codegen and copy header**
-
-```bash
-./codegen.sh
-cp rust/target/bindings.h ios/Runner/bridge_generated.h
-```
-
-8. **Update bridging header**
-
-```c
-#import "GeneratedPluginRegistrant.h"
-#import "bridge_generated.h"
-```
-
-9. **Call dummy method in AppDelegate.swift**
+1. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME
+2. Runner → Build Phases → Bundle Frameworks → + → Add $XCFRAMEWORK_NAME
+3. Drag "bridge_generated.h" → Runner"
+4. Open "Runner-Bridging-Header.h" → Add #import "bridge_generated.h"
+5. Open "AppDelegare.swift" → Add these two lines of code:
 
 ```swift
-let dummy = dummy_method_to_enforce_bundling()
-print(dummy)
+        let dummy = dummy_method_to_enforce_bundling()
+        print(dummy)
 ```
 
----
-
-#### Part 5 — Build Settings
-
-10. **Set Strip Style**
-
-- Use: `Non-Global Symbols`
-
-11. **Run app**
+### macOS
 
 ```bash
-flutter run -d ios
-```
-
-### 💻 MacOS:
-
-#### Part 1 — Rust setup
-
-1. **Update Cargo.toml**
-
-```toml
-crate-type = ["lib", "staticlib", "cdylib"]
-```
-
-```bash
-cd rust && cargo xcode
-```
-
----
-
-#### Part 2 — Xcode setup
-
-2. **Open workspace**
-
-```bash
+chmod +x build_macos.sh
+./build_macos.sh
 open macos/Runner.xcworkspace
 ```
 
-3. **Fix install name base**
+**In Xcode:**
 
-- Set: `@executable_path/../Frameworks/`
+1. Add _librust_lib.dylib_ to your Xcode project under\
+   Runner → Build Phases → Link Binary with Libraries
 
----
+2. Change _librust_lib.dylib_ Embed status in\
+   General → Frameworks, Libraries, and Embedded Content → Embed & Sign
 
-#### Part 3 — Build Phases
+3. Run from _VSCode_ or _Android Studio_
 
-4. **Add dependency**
-
-- Add `rust_lib-cdylib`
-
-5. **Link library**
-
-- Add `rust_lib.dylib`
-- Also add to _Bundle Frameworks_
-
----
-
-#### Part 4 — Headers & Swift
-
-6. **Generate header**
-
-```bash
-./codegen.sh
-cp rust/target/bindings.h macos/Runner/bridge_generated.h
-```
-
-7. **Set bridging header**
-
-- `Runner/bridge_generated.h`
-
-8. **Call dummy method**
-
-```swift
-let dummy = dummy_method_to_enforce_bundling()
-print(dummy)
-```
-
----
-
-#### Part 5 — Rpath
-
-9. **Runpath Search Paths**
-
-- `@executable_path/../Frameworks`
-
-10. **Fix dylib install name**
-
-```bash
-install_name_tool -id   @rpath/librust_lib.dylib   macos/Runner/librust_lib.dylib
-```
-
-11. **Run app**
-
-```bash
-flutter clean && flutter run -d macos
-```
-
-### 🐧 Linux:
+### Linux
 
 ```bash
 chmod +x build_linux.sh
 ./build_linux.sh
 ```
 
-Modify `CMakeLists.txt` file:
+Next: Add the following to your linux/CMakeLists.txt
 
 ```txt
-# For initializing rust library
-set(RUST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/../linux/librust_lib.so")
-  install(FILES "${RUST_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
-  target_link_libraries(${BINARY_NAME} PRIVATE "${RUST_LIB}")
+        # For initializing rust library
+        set(RUST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/../linux/librust_lib.so")
+        install(FILES "${RUST_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
+        target_link_libraries(${BINARY_NAME} PRIVATE "${RUST_LIB}")
 ```
 
 ---
 
-## Step 4 — Run the Flutter app
+## Step 3 — Run the Flutter app
 
 ```bash
 flutter pub get
 flutter run
 ```
-
----
-
-## How the FFI bridge works
-
-```
-Dart (counter_page.dart)
-    │
-    │  calls async method
-    ▼
-RustLib.instance.increment()        ← frb_generated.dart
-    │
-    │  DynamicLibrary.lookupFunction
-    ▼
-librust_lib.so / .dylib / .dll      ← compiled Rust
-    │
-    │  #[no_mangle] pub extern "C" fn increment() -> i64
-    ▼
-COUNTER (Mutex<i64>)                ← Rust global state
-```
-
----
-
-## Adding more crates.io packages
-
-1. Add the dependency to `rust/Cargo.toml`:
-
-   ```toml
-   [dependencies]
-   uuid = { version = "1", features = ["v4"] }
-   ```
-
-2. Use it inside `rust/src/lib.rs`:
-
-   ```rust
-   use uuid::Uuid;
-
-   pub fn generate_id() -> String {
-       Uuid::new_v4().to_string()
-   }
-   ```
-
-3. Re-run codegen → rebuild the native lib → `flutter run`.
-
-Cargo handles all dependency resolution automatically. Only the _boundary_ functions need `pub` — everything internal stays pure Rust.

@@ -9,8 +9,10 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 log = "0.4.29"
-android_logger = "0.15.1"
+env_logger = "0.11.10"
 flutter_rust_bridge = "=2.12.0"
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.14.1"
 
 [profile.release]
 lto = true
