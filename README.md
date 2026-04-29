@@ -11,7 +11,7 @@ Dart (counter_page.dart)
     │  calls apis
     ▼
 getCounter() / increment() / decrement() / reset()       ← api.dart
-    │  
+    │
     │  Each of the api
     │  calls async method
     ▼
@@ -120,18 +120,19 @@ rustup target add aarch64-apple-ios x86_64-apple-ios aarch64-apple-ios-sim
 ```
 
 5. Add `MacOS` targets:
+   <img align="right" src="screenshots/rustup-show.png" width="350"></img>
 
 ```bash
 rustup target add aarch64-apple-darwin x86_64-apple-darwin
 ```
 
 6. To check all the `rustup` targets:
-   <img align="right" src="screenshots/rustup-show.png" width="350"></img>
 
 ```bash
 rustup show
 ```
 
+You will see all the targets that has been installed to your device →\
 <span style="color: red;">\*\* Note: Avoid installing **`rustc`** through **`homebrew`**</span>
 
 7. Install `flutter_rust_bridge_codegen`
