@@ -25,7 +25,7 @@ flutter_counter_frb/
 │           ├── api.dart                 # Re-export for clean imports
 │           ├── frb_generated.dart
 │           └── frb_generated.io.dart
-│     
+│
 ├── android/app/
 │   ├── build.gradle             # jniLibs config
 │   └── src/main/jniLibs/        # .so files go here after build_android.sh
@@ -137,9 +137,21 @@ This places `.so` files into `android/app/src/main/jniLibs/`.
 ```bash
 chmod +x build_ios.sh
 ./build_ios.sh
+open is/Runner.xcworkspace
 ```
 
-Then in Xcode: **Runner → Build Phases → Link Binary with Libraries → + → Add librust_lib.a**
+**In Xcode:**
+
+1. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME
+2. Runner → Build Phases → Bundle Frameworks → + → Add $XCFRAMEWORK_NAME
+3. Drag "bridge_generated.h" → Runner"
+4. Open "Runner-Bridging-Header.h" → Add #import "bridge_generated.h"
+5. Open "AppDelegare.swift" → Add these two lines of code:
+
+```swift
+        let dummy = dummy_method_to_enforce_bundling()
+        print(dummy)
+```
 
 ### macOS
 
@@ -169,10 +181,10 @@ chmod +x build_linux.sh
 Next: Add the following to your linux/CMakeLists.txt
 
 ```txt
-  # For initializing rust library
-  set(RUST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/../linux/librust_lib.so")
-  install(FILES "${RUST_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
-  target_link_libraries(${BINARY_NAME} PRIVATE "${RUST_LIB}")
+        # For initializing rust library
+        set(RUST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/../linux/librust_lib.so")
+        install(FILES "${RUST_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
+        target_link_libraries(${BINARY_NAME} PRIVATE "${RUST_LIB}")
 ```
 
 ---
