@@ -140,7 +140,7 @@ flutter_rust_bridge_codegen generate
 
 ---
 
-## Step 2 — Build the Rust native library
+## Step 2 — Build native library for different platforms
 
 ### Android
 

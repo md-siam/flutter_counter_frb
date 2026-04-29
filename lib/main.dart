@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'counter_page.dart';
+import 'src/loader/load_library.dart';
 import 'src/rust/frb_generated.dart';
-import 'src/loader/load_rust_library.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
