@@ -8,6 +8,11 @@ How the FFI bridge works:
 ```
 Dart (counter_page.dart)
     │
+    │  calls apis
+    ▼
+getCounter() / increment() / decrement() / reset()       ← api.dart
+    │  
+    │  Each of the api
     │  calls async method
     ▼
 RustLib.instance.increment()        ← frb_generated.dart
