@@ -171,6 +171,8 @@ flutter_rust_bridge_codegen generate
 
 ## Step 2: Build native library for different platforms
 
+<img align="right" src="screenshots/build_shells.png"></img>
+
 ### Android
 
 ```bash
