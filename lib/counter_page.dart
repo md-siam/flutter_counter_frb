@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'src/rust/api.dart';
+import 'widgets/header.dart';
 import 'widgets/counter_button.dart';
 import 'widgets/info_bar.dart';
-import 'widgets/rust_badge.dart';
 
 class CounterPage extends StatefulWidget {
   const CounterPage({super.key});
@@ -22,10 +22,6 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
   late Animation<double> _scaleAnim;
 
   Timer? _longPressTimer;
-
-  static const _longPressInterval = Duration(milliseconds: 100);
-
-  static const _longPressInitialDelay = Duration(milliseconds: 400);
 
   @override
   void initState() {
@@ -80,18 +76,6 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
     if (mounted) setState(() => _count = v);
   }
 
-  void _startLongPress(Future<void> Function() action) {
-    action();
-
-    Future.delayed(_longPressInitialDelay, () {
-      if (!mounted) return;
-
-      _longPressTimer = Timer.periodic(_longPressInterval, (_) {
-        action();
-      });
-    });
-  }
-
   void _cancelLongPress() {
     _longPressTimer?.cancel();
     _longPressTimer = null;
@@ -110,37 +94,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(24, 32, 24, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'RUST COUNTER',
-                        style: TextStyle(
-                          fontSize: 15,
-                          letterSpacing: 3,
-                          color: Colors.tealAccent,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'Powered by: \n' 'ffi + flutter_rust_bridge',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
-                  ),
-                  RustBadge(),
-                ],
-              ),
-            ),
+            const Header(),
             const Spacer(),
             _loading
                 ? const CircularProgressIndicator(color: Colors.tealAccent)
@@ -184,16 +138,12 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
                     label: '−',
                     color: Colors.redAccent,
                     onTap: _decrement,
-                    onLongPressStart: () => _startLongPress(_decrement),
-                    onLongPressEnd: _cancelLongPress,
                   ),
                   const SizedBox(width: 16),
                   CounterButton(
                     label: '+',
                     color: Colors.tealAccent,
                     onTap: _increment,
-                    onLongPressStart: () => _startLongPress(_increment),
-                    onLongPressEnd: _cancelLongPress,
                   ),
                 ],
               ),
@@ -211,10 +161,7 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
               ),
             ),
             const Spacer(),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-              child: InfoBar(count: _count),
-            ),
+            InfoBar(count: _count),
           ],
         ),
       ),

@@ -6,23 +6,26 @@ class InfoBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
-      ),
-      child: Row(
-        children: [
-          const _InfoCell(label: 'binding', value: 'FFI'),
-          _vDivider(),
-          const _InfoCell(label: 'bridge', value: 'frb v2'),
-          _vDivider(),
-          const _InfoCell(label: 'language', value: 'Rust'),
-          _vDivider(),
-          _InfoCell(label: 'value', value: count.toString()),
-        ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        ),
+        child: Row(
+          children: [
+            const _InfoCell(label: 'binding', value: 'FFI'),
+            _vDivider(),
+            const _InfoCell(label: 'bridge', value: 'frb v2'),
+            _vDivider(),
+            const _InfoCell(label: 'language', value: 'Rust'),
+            _vDivider(),
+            _InfoCell(label: 'value', value: count.toString()),
+          ],
+        ),
       ),
     );
   }
