@@ -3,13 +3,12 @@ import 'counter_page.dart';
 import 'src/loader/load_library.dart';
 import 'src/rust/frb_generated.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await RustLib.init(
-    externalLibrary: loadRustLibrary(),
-  );
+  
+  // This is necessary for binding the rust library
+  // before starting the application
+  await RustLib.init(externalLibrary: loadRustLibrary());
 
   runApp(const CounterApp());
 }
