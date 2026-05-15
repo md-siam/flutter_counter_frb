@@ -18,10 +18,10 @@ echo "📦 Building Rust library for Android..."
 cd "$RUST_DIR"
 
 # Add Rust targets if not already installed
-# rustup target add \
-#   aarch64-linux-android \
-#   armv7-linux-androideabi \
-#   x86_64-linux-android
+rustup target add \
+  aarch64-linux-android \
+  armv7-linux-androideabi \
+  x86_64-linux-android
 
 # Build with cargo-ndk (handles NDK toolchain setup automatically)
 cargo ndk \

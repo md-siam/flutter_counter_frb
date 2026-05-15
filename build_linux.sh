@@ -18,7 +18,7 @@ echo "📦 Building Rust library for Linux..."
 cd "$RUST_DIR"
 
 # Add target if not already installed
-# rustup target add x86_64-unknown-linux-gnu
+rustup target add x86_64-unknown-linux-gnu
 
 # Build for Linux x86_64
 cargo build --release --target x86_64-unknown-linux-gnu
