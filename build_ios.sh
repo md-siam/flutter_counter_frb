@@ -15,16 +15,14 @@
 set -euo pipefail
 
 RUST_DIR="$(cd "$(dirname "$0")/rust" && pwd)"
-IOS_DIR="$(cd "$(dirname "$0")/ios" && pwd)"
-BUILD_DIR="$RUST_DIR/platform-build/ios"
 
 # ── Output paths ──────────────────────────────────────────────────────────────
 XCFRAMEWORK_NAME="RustLib.xcframework"
-XCFRAMEWORK_OUT="$IOS_DIR/$XCFRAMEWORK_NAME"
+XCFRAMEWORK_OUT="$RUST_DIR/$XCFRAMEWORK_NAME"
 
 # ── Ensure output dirs exist ──────────────────────────────────────────────────
-mkdir -p "$IOS_DIR"
-mkdir -p "$BUILD_DIR/ios-sim-lipo"
+SIM_LIPO_DIR="$RUST_DIR/target/ios-sim-lipo"
+SIM_LIPO_LIB="$SIM_LIPO_DIR/librust_lib.a"
 
 echo "📦 Building Rust library for iOS..."
 echo "   Rust dir : $RUST_DIR"
@@ -58,10 +56,11 @@ cargo build --release --target x86_64-apple-ios
 # Combines Apple Silicon + Intel simulator libs into one slice
 echo ""
 echo "🔗 Creating universal simulator binary with lipo..."
+mkdir -p "$SIM_LIPO_DIR"
 lipo -create \
-  target/aarch64-apple-ios-sim/release/librust_lib.a \
-  target/x86_64-apple-ios/release/librust_lib.a \
-  -output "$BUILD_DIR/ios-sim-lipo/librust_lib.a"
+  "$RUST_DIR/target/aarch64-apple-ios-sim/release/librust_lib.a" \
+  "$RUST_DIR/target/x86_64-apple-ios/release/librust_lib.a" \
+  -output "$SIM_LIPO_LIB"
 
 # ── Step 4: Create XCFramework ─────────────────────────────────────────────────
 # Bundles device + simulator slices into a single distributable framework
@@ -69,17 +68,9 @@ echo ""
 echo "📦 Creating XCFramework..."
 rm -rf "$XCFRAMEWORK_OUT"
 xcodebuild -create-xcframework \
-  -library target/aarch64-apple-ios/release/librust_lib.a \
-  -library "$BUILD_DIR/ios-sim-lipo/librust_lib.a" \
+  -library "$RUST_DIR/target/aarch64-apple-ios/release/librust_lib.a" \
+  -library "$SIM_LIPO_LIB" \
   -output "$XCFRAMEWORK_OUT"
-
-# ── Step 5: Verify symbols are exported ───────────────────────────────────────
-echo ""
-echo "🔍 Verifying exported symbols..."
-nm "$IOS_DIR/$XCFRAMEWORK_NAME/ios-arm64/librust_lib.a" \
-  | grep -E "get_counter|increment|decrement|reset" \
-  && echo "✅ Symbols verified!" \
-  || echo "⚠️  Warning: expected symbols not found — check api.rs"
 
 # ── Done ───────────────────────────────────────────────────────────────────────
 echo ""
@@ -87,9 +78,9 @@ echo "✅ XCFramework written to: $XCFRAMEWORK_OUT"
 echo ""
 echo "Next steps in Xcode:"
 echo "  1. Open ios/Runner.xcworkspace"
-echo "  2. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME"
+echo "  2. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME (from rust folder)" 
 echo "  3. Runner → Build Phases → Bundle Frameworks → + → Add $XCFRAMEWORK_NAME"
-echo "  4. Drag "bridge_generated.h" → Runner"
+echo "  4. Drag "bridge_generated.h" (from rust folder) → Runner"
 echo "  5. Open "Runner-Bridging-Header.h" → Add #import "bridge_generated.h" "
 echo "  6. Open "AppDelegare.swift" → Add these two lines of code: "
 echo ""
