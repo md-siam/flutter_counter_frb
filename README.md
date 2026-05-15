@@ -130,6 +130,8 @@ rustup target add aarch64-apple-darwin x86_64-apple-darwin
 
 ```bash
 rustup show
+or
+rustup target list --installed
 ```
 
 You will see all the targets that has been installed to your device →\
@@ -139,6 +141,12 @@ You will see all the targets that has been installed to your device →\
 
 ```bash
 cargo install flutter_rust_bridge_codegen
+```
+
+8. Check `flutter_rust_bridge_codegen` version
+
+```bash
+flutter_rust_bridge_codegen --version
 ```
 
 ---
@@ -246,3 +254,7 @@ Next: Add the following to your linux/CMakeLists.txt
 flutter pub get
 flutter run
 ```
+
+You will see this:
+
+<p align="center"><img src="screenshots/demo.gif"></p>
