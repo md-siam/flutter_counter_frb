@@ -201,16 +201,21 @@ open is/Runner.xcworkspace
 
 **In Xcode:**
 
-1. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME
-2. Runner → Build Phases → Bundle Frameworks → + → Add $XCFRAMEWORK_NAME
-3. Drag "bridge_generated.h" → Runner"
-4. Open "Runner-Bridging-Header.h" → Add #import "bridge_generated.h"
-5. Open "AppDelegare.swift" → Add these two lines of code:
-
+1. To open the "ios" folder in Xcode, run in terminal run: 
+```bash
+    open ios/Runner.xcworkspace
+```
+2. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME (from rust folder)
+3. Runner → Build Phases → Bundle Frameworks (optional) → + → Add $XCFRAMEWORK_NAME
+4. Drag "bridge_generated.h" (from rust folder) → Runner"
+5. Open "Runner-Bridging-Header.h" → Add #import "bridge_generated.h"
+6. Open "AppDelegare.swift" → Add these two lines of code:
 ```swift
         let dummy = dummy_method_to_enforce_bundling()
         print(dummy)
 ```
+7. To check the import working perfectly → cmd + click on "dummy_method_to_enforce_bundling()" on xcode"
+8. Run the project from Vscode or Android Studio
 
 ### macOS
 
