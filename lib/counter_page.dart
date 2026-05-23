@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'src/rust/api.dart';
-import 'widgets/header.dart';
 import 'widgets/counter_button.dart';
+import 'widgets/header.dart';
 import 'widgets/info_bar.dart';
 
 class CounterPage extends StatefulWidget {
@@ -20,8 +20,6 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
 
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
-
-  Timer? _longPressTimer;
 
   @override
   void initState() {
@@ -40,7 +38,6 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
 
   @override
   void dispose() {
-    _cancelLongPress();
     _animController.dispose();
     super.dispose();
   }
@@ -74,11 +71,6 @@ class _CounterPageState extends State<CounterPage> with SingleTickerProviderStat
   Future<void> _reset() async {
     final v = await reset();
     if (mounted) setState(() => _count = v);
-  }
-
-  void _cancelLongPress() {
-    _longPressTimer?.cancel();
-    _longPressTimer = null;
   }
 
   Color get _countColor {
