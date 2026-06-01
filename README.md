@@ -201,19 +201,23 @@ open is/Runner.xcworkspace
 
 **In Xcode:**
 
-1. To open the "ios" folder in Xcode, run in terminal run: 
+1. To open the "ios" folder in Xcode, run in terminal run:
+
 ```bash
     open ios/Runner.xcworkspace
 ```
+
 2. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME (from rust folder)
 3. Runner → Build Phases → Bundle Frameworks (optional) → + → Add $XCFRAMEWORK_NAME
 4. Drag "bridge_generated.h" (from rust folder) → Runner"
 5. Open "Runner-Bridging-Header.h" → Add #import "bridge_generated.h"
 6. Open "AppDelegare.swift" → Add these two lines of code:
+
 ```swift
         let dummy = dummy_method_to_enforce_bundling()
         print(dummy)
 ```
+
 7. To check the import working perfectly → cmd + click on "dummy_method_to_enforce_bundling()" on xcode"
 8. Run the project from Vscode or Android Studio
 
@@ -249,6 +253,22 @@ Next: Add the following to your linux/CMakeLists.txt
         set(RUST_LIB "${CMAKE_CURRENT_SOURCE_DIR}/../linux/librust_lib.so")
         install(FILES "${RUST_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}")
         target_link_libraries(${BINARY_NAME} PRIVATE "${RUST_LIB}")
+```
+
+### Web
+
+Minimum SDK requirement is 3.3.0, so check your `pubspec.yaml`, and set the sdk to:
+
+```yaml
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+```
+
+Install wasm pack:
+
+```bash
+    cargo install wasm-pack
+    wasm-pack --version
 ```
 
 ---

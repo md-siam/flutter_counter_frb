@@ -7,5 +7,5 @@ dart_format_line_length: 100
 # It should be true for properly bridge_generated.h generate
 full_dep: true
 
-# This prevents frb_generated.web.dart from being generated
-web: false
+# Generate the web bridge file used by Flutter web builds.
+web: true
