@@ -10,8 +10,11 @@
 
 set -euo pipefail
 
-RUST_DIR="$(cd "$(dirname "$0")/rust" && pwd)"
-OUT_DIR="$(cd "$(dirname "$0")/android/app/src/main/jniLibs" && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
+RUST_DIR="$ROOT_DIR/rust"
+OUT_DIR="$ROOT_DIR/android/app/src/main/jniLibs"
+
+mkdir -p "$OUT_DIR"
 
 echo "📦 Building Rust library for Android..."
 
