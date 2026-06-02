@@ -20,8 +20,8 @@ cd "$RUST_DIR"
 
 # Add targets if not already installed
 rustup target add \
-  aarch64-apple-darwin \
-  x86_64-apple-darwin
+	aarch64-apple-darwin \
+	x86_64-apple-darwin
 
 # Build for both Apple Silicon and Intel
 cargo build --release --target aarch64-apple-darwin
@@ -29,9 +29,9 @@ cargo build --release --target x86_64-apple-darwin
 
 # Merge into a universal binary (works on both chips)
 lipo -create \
-  target/aarch64-apple-darwin/release/librust_lib.dylib \
-  target/x86_64-apple-darwin/release/librust_lib.dylib \
-  -output "$OUT_DIR/librust_lib.dylib"
+	target/aarch64-apple-darwin/release/librust_lib.dylib \
+	target/x86_64-apple-darwin/release/librust_lib.dylib \
+	-output "$OUT_DIR/librust_lib.dylib"
 
 echo "✅ Universal macOS dylib written to: $OUT_DIR/librust_lib.dylib"
 echo ""

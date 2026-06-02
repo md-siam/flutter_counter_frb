@@ -11,25 +11,29 @@
 set -euo pipefail
 
 RUST_DIR="$(cd "$(dirname "$0")/rust" && pwd)"
-OUT_DIR="$(cd "$(dirname "$0")/android/app/src/main/jniLibs" && pwd)"
+OUT_DIR="$(cd "$(dirname "$0")/android/app/src/main" && pwd)/jniLibs"
 
 echo "📦 Building Rust library for Android..."
+echo "   Rust dir : $RUST_DIR"
+echo "   Output   : $OUT_DIR"
+echo ""
 
 cd "$RUST_DIR"
+mkdir -p "$OUT_DIR"
 
 # Add Rust targets if not already installed
 rustup target add \
-  aarch64-linux-android \
-  armv7-linux-androideabi \
-  x86_64-linux-android
+	aarch64-linux-android \
+	armv7-linux-androideabi \
+	x86_64-linux-android
 
 # Build with cargo-ndk (handles NDK toolchain setup automatically)
 cargo ndk \
-  -t arm64-v8a \
-  -t armeabi-v7a \
-  -t x86_64 \
-  -o "$OUT_DIR" \
-  build --release
+	-t arm64-v8a \
+	-t armeabi-v7a \
+	-t x86_64 \
+	-o "$OUT_DIR" \
+	build --release
 
 echo "✅ Android .so files written to: $OUT_DIR"
 echo ""

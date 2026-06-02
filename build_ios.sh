@@ -35,9 +35,9 @@ cd "$RUST_DIR"
 # Safe to run every time — no-op if already installed
 echo "🎯 Adding Rust targets..."
 rustup target add \
-  aarch64-apple-ios \
-  aarch64-apple-ios-sim \
-  x86_64-apple-ios
+	aarch64-apple-ios \
+	aarch64-apple-ios-sim \
+	x86_64-apple-ios
 
 # ── Step 2: Build for all targets ─────────────────────────────────────────────
 echo ""
@@ -58,9 +58,9 @@ echo ""
 echo "🔗 Creating universal simulator binary with lipo..."
 mkdir -p "$SIM_LIPO_DIR"
 lipo -create \
-  "$RUST_DIR/target/aarch64-apple-ios-sim/release/librust_lib.a" \
-  "$RUST_DIR/target/x86_64-apple-ios/release/librust_lib.a" \
-  -output "$SIM_LIPO_LIB"
+	"$RUST_DIR/target/aarch64-apple-ios-sim/release/librust_lib.a" \
+	"$RUST_DIR/target/x86_64-apple-ios/release/librust_lib.a" \
+	-output "$SIM_LIPO_LIB"
 
 # ── Step 4: Create XCFramework ─────────────────────────────────────────────────
 # Bundles device + simulator slices into a single distributable framework
@@ -68,9 +68,9 @@ echo ""
 echo "📦 Creating XCFramework..."
 rm -rf "$XCFRAMEWORK_OUT"
 xcodebuild -create-xcframework \
-  -library "$RUST_DIR/target/aarch64-apple-ios/release/librust_lib.a" \
-  -library "$SIM_LIPO_LIB" \
-  -output "$XCFRAMEWORK_OUT"
+	-library "$RUST_DIR/target/aarch64-apple-ios/release/librust_lib.a" \
+	-library "$SIM_LIPO_LIB" \
+	-output "$XCFRAMEWORK_OUT"
 
 # ── Done ───────────────────────────────────────────────────────────────────────
 echo ""
@@ -78,14 +78,14 @@ echo "✅ XCFramework written to: $XCFRAMEWORK_OUT"
 echo ""
 echo "Next steps in Xcode:"
 echo "  1. To open the \"ios\" folder in Xcode, run in terminal → \"open ios/Runner.xcworkspace\""
-echo "  2. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME (from rust folder)" 
+echo "  2. Runner → Build Phases → Link Binary With Libraries → + → Add $XCFRAMEWORK_NAME (from rust folder)"
 echo "  3. Runner → Build Phases → Bundle Frameworks (optional) → + → Add $XCFRAMEWORK_NAME"
 echo "  4. Drag \"bridge_generated.h\" (from rust folder) → Runner"
 echo "  5. Open \"Runner-Bridging-Header.h\" → Add #import \"bridge_generated.h\""
 echo "  6. Open \"AppDelegare.swift\" → Add these two lines of code: "
 echo ""
 echo "           let dummy = dummy_method_to_enforce_bundling()"
-echo "           print(dummy)"  
-echo ""                        
+echo "           print(dummy)"
+echo ""
 echo "  7. To check the import working perfectly → cmd + click on \"dummy_method_to_enforce_bundling()\" on xcode"
 echo "  8. Run the project from Vscode or Android Studio"
